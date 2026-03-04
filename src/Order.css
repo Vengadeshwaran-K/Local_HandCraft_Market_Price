@@ -1,0 +1,21 @@
+.order-container{
+  width:500px;
+  margin:auto;
+  margin-top:40px;
+}
+
+.order-form{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.order-form input,
+.order-form select{
+  padding:6px;
+}
+
+button{
+  width:150px;
+  padding:8px;
+}

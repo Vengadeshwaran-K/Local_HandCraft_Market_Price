@@ -1,0 +1,33 @@
+.product-container{
+  width:600px;
+  margin:auto;
+  margin-top:40px;
+}
+
+.menu-buttons{
+  margin-bottom:25px;
+}
+
+.menu-buttons button{
+  margin-right:10px;
+  padding:8px 15px;
+}
+
+.product-form{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.product-form input{
+  padding:6px;
+}
+
+table{
+  border-collapse:collapse;
+}
+
+table th, table td{
+  border:1px solid black;
+  padding:6px 10px;
+}
