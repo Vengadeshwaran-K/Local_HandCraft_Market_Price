@@ -15,5 +15,5 @@ public interface UserService {
 
     public UserEntity getUserById(Integer id);
 
-    Response deleteUser(Integer id);
+    Response deleteUser(int id);
 }

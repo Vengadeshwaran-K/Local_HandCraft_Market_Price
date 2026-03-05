@@ -25,6 +25,6 @@ public class UserEntity {
     @NotBlank(message = "Phone number cannot be empty")
     @Size(min=10,max=10,message="Phone msut be 10 digits")
     private String phone;
-    private String Address;
+    private String address;
 
 }

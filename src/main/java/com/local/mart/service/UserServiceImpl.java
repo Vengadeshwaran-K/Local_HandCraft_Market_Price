@@ -6,6 +6,7 @@ import com.local.mart.util.Response;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -81,13 +82,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response deleteUser(Integer id) {
+    public Response deleteUser(int id) {
 
-        if (!userRepo.existsById(id))
-            return new Response("User not found");
+        Response response = new Response();
+
+        Optional<UserEntity> user = userRepo.findById(id);
+
+        if(user.isEmpty()){
+            response.message = "User not found";
+            return response;
+        }
 
         userRepo.deleteById(id);
 
-        return new Response("User Deleted Successfully");
+        response.message = "User deleted successfully";
+        return response;
     }
 }
