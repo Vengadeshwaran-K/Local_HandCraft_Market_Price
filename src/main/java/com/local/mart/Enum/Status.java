@@ -1,6 +1,5 @@
 package com.local.mart.Enum;
 
 public enum Status {
-
-    CREATED,APPROVED,REJECTED
+    CREATED, SHIPPED, DELIVERED, RETURNED, CANCELLED
 }

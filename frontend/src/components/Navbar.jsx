@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
-import { ShoppingBag, LogOut, User, LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
+import { ShoppingBag, LogOut, User, LayoutDashboard, LogIn, UserPlus, Package } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
@@ -17,10 +17,12 @@ const Navbar = () => {
             <Link to="/" className="nav-brand">LOCAL MART</Link>
 
             <div className="nav-links">
-                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: 'inherit' }}>
-                    <ShoppingBag size={20} />
-                    <span>Shop</span>
-                </Link>
+                {user && (
+                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: 'inherit' }}>
+                        <ShoppingBag size={20} />
+                        <span>Shop</span>
+                    </Link>
+                )}
 
                 {user ? (
                     <>
@@ -28,6 +30,12 @@ const Navbar = () => {
                             <Link to="/admin" style={{ display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: 'inherit' }}>
                                 <LayoutDashboard size={20} />
                                 <span>Dashboard</span>
+                            </Link>
+                        )}
+                        {user.role !== 'ROLE_ADMIN' && (
+                            <Link to="/my-orders" style={{ display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: 'inherit' }}>
+                                <Package size={20} />
+                                <span>My Orders</span>
                             </Link>
                         )}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>

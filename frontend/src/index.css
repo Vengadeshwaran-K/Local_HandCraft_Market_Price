@@ -24,7 +24,7 @@
 body {
   background: var(--bg);
   background: radial-gradient(circle at top right, #1e1b4b, #0f172a),
-              radial-gradient(circle at bottom left, #312e81, #0f172a);
+    radial-gradient(circle at bottom left, #312e81, #0f172a);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
@@ -70,7 +70,9 @@ button {
   font-size: 0.9rem;
 }
 
-.input-group input, .input-group select, .input-group textarea {
+.input-group input,
+.input-group select,
+.input-group textarea {
   width: 100%;
   padding: 12px 16px;
   background: var(--glass);
@@ -78,6 +80,11 @@ button {
   border-radius: var(--radius);
   color: #fff;
   transition: var(--transition);
+}
+
+.input-group select option {
+  background: #1e293b;
+  color: #fff;
 }
 
 .input-group input:focus {

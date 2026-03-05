@@ -9,7 +9,7 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [orderForm, setOrderForm] = useState({ quantity: 1, paymentMethod: 'CASH' });
+    const [orderForm, setOrderForm] = useState({ quantity: 1, paymentMethod: 'COD' });
     const [message, setMessage] = useState('');
     const { user } = useContext(AuthContext);
 
@@ -40,6 +40,8 @@ const Home = () => {
         e.preventDefault();
         try {
             const orderData = {
+                productId: selectedProduct.id,
+                userEmail: user.email,
                 productName: selectedProduct.name,
                 category: selectedProduct.category,
                 quantity: orderForm.quantity,
@@ -106,14 +108,23 @@ const Home = () => {
                             </span>
                         </div>
 
-                        <button
-                            className="btn-primary"
-                            style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
-                            onClick={() => handleBuyClick(product)}
-                            disabled={product.stock <= 0}
-                        >
-                            <ShoppingCart size={18} /> Buy Now
-                        </button>
+
+                        {user?.role !== 'ROLE_ADMIN' && (
+                            <button
+                                className="btn-primary"
+                                style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
+                                onClick={() => handleBuyClick(product)}
+                                disabled={product.stock <= 0}
+                            >
+                                <ShoppingCart size={18} /> Buy Now
+                            </button>
+                        )}
+                        {user?.role === 'ROLE_ADMIN' && (
+                            <div style={{ marginTop: '20px', padding: '10px', background: 'var(--glass)', borderRadius: '8px', textAlign: 'center', fontSize: '0.9rem', color: 'var(--primary)' }}>
+                                <Info size={16} style={{ verticalAlign: 'middle', marginRight: '5px' }} />
+                                Admin View Only
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             ))}
@@ -168,7 +179,7 @@ const Home = () => {
                                             value={orderForm.paymentMethod}
                                             onChange={(e) => setOrderForm({ ...orderForm, paymentMethod: e.target.value })}
                                         >
-                                            <option value="CASH">Cash on Delivery</option>
+                                            <option value="COD">Cash on Delivery</option>
                                             <option value="BANK_TRANSFER">Bank Transfer</option>
                                             <option value="CARD">Credit Card</option>
                                             <option value="UPI">UPI</option>

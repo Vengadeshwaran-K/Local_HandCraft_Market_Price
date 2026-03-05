@@ -21,6 +21,7 @@ public class OrderController {
     }
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public Response createOrder(@RequestBody OrderEntity order) {
         return orderService.createOrder(order);
     }
@@ -29,6 +30,11 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     public List<OrderEntity> getAllOrders() {
         return orderService.getAllOrders();
+    }
+
+    @GetMapping("/my")
+    public List<OrderEntity> getMyOrders(@RequestParam String email) {
+        return orderService.getOrdersByUser(email);
     }
 
     @GetMapping("/{id}")

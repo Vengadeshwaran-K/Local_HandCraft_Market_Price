@@ -1,29 +1,33 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../api/api';
 import { AuthContext } from '../App';
-import { LayoutDashboard, Plus, Trash2, Edit2, Package, Save, X, AlertCircle, ShoppingCart } from 'lucide-react';
+import { LayoutDashboard, Plus, Trash2, Edit2, Package, Save, X, AlertCircle, ShoppingCart, Users, Check, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminDashboard = () => {
     const { user } = useContext(AuthContext);
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]);
+    const [usersList, setUsersList] = useState([]);
     const [isAdding, setIsAdding] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [newProduct, setNewProduct] = useState({ name: '', description: '', category: 'Handicrafts', price: 0, stock: 0 });
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
+    const [activeTab, setActiveTab] = useState('inventory');
 
     useEffect(() => {
         if (user?.role !== 'ROLE_ADMIN') return;
         const fetchData = async () => {
             try {
-                const [pRes, oRes] = await Promise.all([
+                const [pRes, oRes, uRes] = await Promise.all([
                     api.get('/products'),
-                    api.get('/orders')
+                    api.get('/orders'),
+                    api.get('/users/allUsers')
                 ]);
                 setProducts(pRes.data);
                 setOrders(oRes.data);
+                setUsersList(uRes.data);
             } catch (err) {
                 console.error('Failed to fetch admin data', err);
             } finally {
@@ -40,7 +44,6 @@ const AdminDashboard = () => {
             setMessage('Product added successfully!');
             setIsAdding(false);
             setNewProduct({ name: '', description: '', category: 'Handicrafts', price: 0, stock: 0 });
-            // Refresh
             const res = await api.get('/products');
             setProducts(res.data);
         } catch (err) {
@@ -55,7 +58,7 @@ const AdminDashboard = () => {
             setProducts(products.filter(p => p.id !== id));
             setMessage('Product deleted');
         } catch (err) {
-            setMessage('Delete failed: ' + (err.response?.data?.message || 'Unauthorized'));
+            setMessage('Delete failed');
         }
     };
 
@@ -69,6 +72,40 @@ const AdminDashboard = () => {
             setProducts(res.data);
         } catch (err) {
             setMessage('Update failed');
+        }
+    };
+
+    const handleDeleteUser = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this user?')) return;
+        try {
+            await api.delete(`/users/${id}`);
+            setUsersList(usersList.filter(u => u.id !== id));
+            setMessage('User deleted');
+        } catch (err) {
+            setMessage('Failed to delete user');
+        }
+    };
+
+    const handleUpdateOrderStatus = async (id, status) => {
+        try {
+            const order = orders.find(o => o.id === id);
+            await api.put(`/orders/${id}`, { ...order, status });
+            setMessage(`Order #${id} updated to ${status}`);
+            const res = await api.get('/orders');
+            setOrders(res.data);
+        } catch (err) {
+            setMessage('Failed to update order: ' + (err.response?.data?.message || err.message));
+        }
+    };
+
+    const handleDeleteOrder = async (id) => {
+        if (!window.confirm('Delete this order record?')) return;
+        try {
+            await api.delete(`/orders/${id}`);
+            setOrders(orders.filter(o => o.id !== id));
+            setMessage('Order deleted');
+        } catch (err) {
+            setMessage('Failed to delete order');
         }
     };
 
@@ -86,73 +123,121 @@ const AdminDashboard = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
                 <h1 style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     <LayoutDashboard size={40} color="var(--primary)" />
-                    Admin Dashboard
+                    Admin Console
                 </h1>
-                <button
-                    onClick={() => setIsAdding(true)}
-                    className="btn-primary"
-                    style={{ width: 'auto', padding: '12px 24px', display: 'flex', gap: '8px' }}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={() => setActiveTab('inventory')} className={`btn-primary ${activeTab === 'inventory' ? '' : 'btn-outline'}`} style={{ width: 'auto' }}>Inventory</button>
+                    <button onClick={() => setActiveTab('orders')} className={`btn-primary ${activeTab === 'orders' ? '' : 'btn-outline'}`} style={{ width: 'auto' }}>Orders</button>
+                    <button onClick={() => setActiveTab('users')} className={`btn-primary ${activeTab === 'users' ? '' : 'btn-outline'}`} style={{ width: 'auto' }}>Users</button>
+                </div>
+            </div>
+
+            {message && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                    style={{ background: 'var(--glass)', padding: '15px', borderRadius: '8px', marginBottom: '30px', borderLeft: '5px solid var(--primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 >
-                    <Plus size={20} /> Add New Product
-                </button>
-            </div>
+                    {message}
+                    <X size={18} style={{ cursor: 'pointer' }} onClick={() => setMessage('')} />
+                </motion.div>
+            )}
 
-            {message && <div style={{ background: 'var(--glass)', padding: '15px', borderRadius: '8px', marginBottom: '30px', borderLeft: '5px solid var(--primary)' }}>{message}</div>}
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '40px' }}>
-                {/* Product Management */}
-                <section>
-                    <h2 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}><Package color="var(--secondary)" /> Inventory Management</h2>
-                    <div style={{ background: 'var(--card)', borderRadius: '15px', padding: '10px' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white' }}>
-                            <thead>
-                                <tr style={{ borderBottom: '1px solid var(--glass-border)', textAlign: 'left' }}>
-                                    <th style={{ padding: '15px' }}>Product</th>
-                                    <th style={{ padding: '15px' }}>Category</th>
-                                    <th style={{ padding: '15px' }}>Price</th>
-                                    <th style={{ padding: '15px' }}>Stock</th>
-                                    <th style={{ padding: '15px' }}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products.map(p => (
-                                    <tr key={p.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                                        <td style={{ padding: '15px' }}><strong>{p.name}</strong></td>
-                                        <td style={{ padding: '15px' }}>{p.category}</td>
-                                        <td style={{ padding: '15px', color: 'var(--accent)' }}>${p.price}</td>
-                                        <td style={{ padding: '15px' }}>{p.stock}</td>
-                                        <td style={{ padding: '15px', display: 'flex', gap: '10px' }}>
-                                            <button onClick={() => setEditingProduct(p)} style={{ background: 'var(--primary)', padding: '6px', borderRadius: '4px' }}><Edit2 size={16} /></button>
-                                            <button onClick={() => handleDeleteProduct(p.id)} style={{ background: 'var(--danger)', padding: '6px', borderRadius: '4px' }}><Trash2 size={16} /></button>
-                                        </td>
+            <AnimatePresence mode="wait">
+                {activeTab === 'inventory' && (
+                    <motion.section key="inventory" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><Package color="var(--secondary)" /> Inventory Management</h2>
+                            <button onClick={() => setIsAdding(true)} className="btn-primary" style={{ width: 'auto', padding: '8px 20px' }}><Plus size={18} /> Add Product</button>
+                        </div>
+                        <div className="glass-card" style={{ padding: '0', overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white' }}>
+                                <thead style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                    <tr>
+                                        <th style={{ padding: '15px', textAlign: 'left' }}>Product</th>
+                                        <th style={{ padding: '15px', textAlign: 'left' }}>Category</th>
+                                        <th style={{ padding: '15px', textAlign: 'left' }}>Price</th>
+                                        <th style={{ padding: '15px', textAlign: 'left' }}>Stock</th>
+                                        <th style={{ padding: '15px', textAlign: 'right' }}>Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+                                </thead>
+                                <tbody>
+                                    {products.map(p => (
+                                        <tr key={p.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
+                                            <td style={{ padding: '15px' }}><strong>{p.name}</strong></td>
+                                            <td style={{ padding: '15px' }}>{p.category}</td>
+                                            <td style={{ padding: '15px', color: 'var(--accent)' }}>${p.price}</td>
+                                            <td style={{ padding: '15px' }}>{p.stock}</td>
+                                            <td style={{ padding: '15px', textAlign: 'right' }}>
+                                                <button onClick={() => setEditingProduct(p)} style={{ background: 'var(--primary)', padding: '6px', borderRadius: '4px', marginRight: '5px' }}><Edit2 size={16} /></button>
+                                                <button onClick={() => handleDeleteProduct(p.id)} style={{ background: 'var(--danger)', padding: '6px', borderRadius: '4px' }}><Trash2 size={16} /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.section>
+                )}
 
-                {/* Orders Overview */}
-                <section>
-                    <h2 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}><ShoppingCart color="var(--accent)" /> Recent Orders</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        {orders.map(o => (
-                            <div key={o.id} style={{ background: 'var(--glass)', padding: '15px', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                    <strong>{o.productName}</strong>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{o.createdAt}</span>
+                {activeTab === 'orders' && (
+                    <motion.section key="orders" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                        <h2 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}><ShoppingCart color="var(--accent)" /> Order Management</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+                            {orders.map(o => (
+                                <div key={o.id} className="glass-card" style={{ padding: '20px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                                        <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>ORD #{o.id}</span>
+                                        <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{o.createdAt}</span>
+                                    </div>
+                                    <h3 style={{ marginBottom: '5px' }}>{o.productName}</h3>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--muted)', marginBottom: '15px' }}>Customer: {o.userEmail}</p>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                        <span>Qty: {o.quantity}</span>
+                                        <span style={{ padding: '4px 10px', borderRadius: '4px', background: 'var(--glass)', fontSize: '0.8rem', color: 'var(--accent)' }}>{o.status}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <button onClick={() => handleUpdateOrderStatus(o.id, 'SHIPPED')} className="btn-primary" style={{ padding: '8px', flex: 1, background: '#3b82f6', fontSize: '0.8rem' }}><Clock size={14} /> Ship</button>
+                                        <button onClick={() => handleUpdateOrderStatus(o.id, 'DELIVERED')} className="btn-primary" style={{ padding: '8px', flex: 1, background: '#10b981', fontSize: '0.8rem' }}><Check size={14} /> Deliver</button>
+                                        <button onClick={() => handleDeleteOrder(o.id)} style={{ background: 'var(--danger)', padding: '8px', borderRadius: '6px' }}><Trash2 size={16} /></button>
+                                    </div>
                                 </div>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--muted)', display: 'flex', justifyContent: 'space-between' }}>
-                                    <span>Qty: {o.quantity}</span>
-                                    <span style={{ color: 'var(--success)' }}>{o.status}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </div>
+                            ))}
+                        </div>
+                    </motion.section>
+                )}
 
-            {/* Modals for Add/Edit */}
+                {activeTab === 'users' && (
+                    <motion.section key="users" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                        <h2 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}><Users color="var(--primary)" /> User Accounts</h2>
+                        <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white' }}>
+                                <thead style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                    <tr>
+                                        <th style={{ padding: '15px', textAlign: 'left' }}>User</th>
+                                        <th style={{ padding: '15px', textAlign: 'left' }}>Email</th>
+                                        <th style={{ padding: '15px', textAlign: 'left' }}>Role</th>
+                                        <th style={{ padding: '15px', textAlign: 'right' }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {usersList.map(u => (
+                                        <tr key={u.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
+                                            <td style={{ padding: '15px' }}>{u.name}</td>
+                                            <td style={{ padding: '15px' }}>{u.email}</td>
+                                            <td style={{ padding: '15px' }}><span className="tag">{u.role || 'ROLE_USER'}</span></td>
+                                            <td style={{ padding: '15px', textAlign: 'right' }}>
+                                                <button onClick={() => handleDeleteUser(u.id)} disabled={u.email === user.email} style={{ background: 'var(--danger)', padding: '6px', borderRadius: '4px', opacity: u.email === user.email ? 0.5 : 1 }}><Trash2 size={16} /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.section>
+                )}
+            </AnimatePresence>
+
+            {/* Modals for Add/Edit Product */}
             <AnimatePresence>
                 {(isAdding || editingProduct) && (
                     <motion.div

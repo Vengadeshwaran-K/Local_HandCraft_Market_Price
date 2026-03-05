@@ -11,6 +11,8 @@ public interface OrderService {
 
     List<OrderEntity> getAllOrders();
 
+    List<OrderEntity> getOrdersByUser(String email);
+
     OrderEntity getOrderById(int id);
 
     Response updateOrder(int id, OrderEntity order);

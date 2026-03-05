@@ -1,9 +1,5 @@
 package com.local.mart.Enum;
 
 public enum PaymentMethod {
-
-    COD,
-    CARD,
-    UPI
-
+    COD, CARD, UPI, BANK_TRANSFER
 }

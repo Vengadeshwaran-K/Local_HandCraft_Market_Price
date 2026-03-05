@@ -42,6 +42,9 @@ public class UserServiceImpl implements UserService {
             return new Response("Phone already registered");
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null) {
+            user.setRole(com.local.mart.Enum.Role.ROLE_USER);
+        }
         userRepo.save(user);
 
         return new Response("User Created Successfully");
@@ -51,7 +54,8 @@ public class UserServiceImpl implements UserService {
     public Response login(String email, String password) {
         Optional<UserEntity> user = userRepo.findByEmail(email);
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            String token = jwtUtil.generateToken(user.get().getEmail(), user.get().getRole().name());
+            String roleName = user.get().getRole() != null ? user.get().getRole().name() : "ROLE_USER";
+            String token = jwtUtil.generateToken(user.get().getEmail(), roleName);
             return new Response(token);
         }
         return new Response("Invalid credentials");
