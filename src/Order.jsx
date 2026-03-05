@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./Order.css";
 
 function Order() {
-
-  const [categories, setCategories] = useState([]);
 
   const [orderData, setOrderData] = useState({
     productName: "",
@@ -22,21 +20,22 @@ function Order() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    console.log("Order Placed:", orderData);
+    const res = await fetch("http://localhost:8080/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    const data = await res.json();
+
+    alert(data.message);
   };
-
-  // Fetch categories from backend
-  useEffect(() => {
-
-    fetch("http://localhost:8080/categories")
-      .then(res => res.json())
-      .then(data => setCategories(data));
-
-  }, []);
 
   return (
     <div className="order-container">
@@ -54,22 +53,12 @@ function Order() {
         />
 
         <label>Category</label>
-
-        <select
+        <input
+          type="text"
           name="category"
           value={orderData.category}
           onChange={handleChange}
-        >
-
-          <option value="">Select Category</option>
-
-          {categories.map((cat, index) => (
-            <option key={index} value={cat}>
-              {cat}
-            </option>
-          ))}
-
-        </select>
+        />
 
         <label>Quantity</label>
         <input
@@ -88,7 +77,7 @@ function Order() {
         >
           <option value="">Select</option>
           <option value="COD">Cash on Delivery</option>
-          <option value="Card">Card</option>
+          <option value="CARD">Card</option>
           <option value="UPI">UPI</option>
         </select>
 
