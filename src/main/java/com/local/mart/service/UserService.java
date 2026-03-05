@@ -16,4 +16,6 @@ public interface UserService {
     public UserEntity getUserById(Integer id);
 
     Response deleteUser(int id);
+
+    Response login(String email, String password);
 }

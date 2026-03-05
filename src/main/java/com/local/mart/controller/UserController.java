@@ -9,41 +9,51 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     UserService userService;
 
-    /* CREATE USER */
-    @PostMapping("/create")
-    public Response createUser(@Valid @RequestBody UserEntity user){
+    /* REGISTER USER */
+    @PostMapping("/register")
+    public Response registerUser(@Valid @RequestBody UserEntity user) {
         return userService.createUser(user);
+    }
+
+    /* LOGIN USER */
+    @PostMapping("/login")
+    public Response login(@RequestBody UserEntity user) {
+        return userService.login(user.getEmail(), user.getPassword());
     }
 
     /* GET ALL USERS */
     @GetMapping("/allUsers")
-    public List<UserEntity> getAllUsers(){
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserEntity> getAllUsers() {
         return userService.getUser();
     }
 
     /* UPDATE USER */
     @PutMapping("/updateUsers")
-    public Response updateUser(@RequestBody UserEntity user){
+    public Response updateUser(@RequestBody UserEntity user) {
         return userService.updateUser(user);
     }
 
     /* GET USER BY ID */
     @GetMapping("/{id}")
-    public UserEntity getUserById(@PathVariable int id){
+    public UserEntity getUserById(@PathVariable int id) {
         return userService.getUserById(id);
     }
 
     /* DELETE USER */
     @DeleteMapping("/{id}")
-    public Response deleteUser(@PathVariable int id){
+    @PreAuthorize("hasRole('ADMIN')")
+    public Response deleteUser(@PathVariable int id) {
         return userService.deleteUser(id);
     }
 

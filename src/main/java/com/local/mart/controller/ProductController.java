@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/products")
 @CrossOrigin(origins = "*")
@@ -28,27 +30,30 @@ public class ProductController {
     }
 
     @PostMapping
-    public Response create(@RequestBody ProductEntity product){
+    @PreAuthorize("hasRole('ADMIN')")
+    public Response create(@RequestBody ProductEntity product) {
         return productService.createProducts(product);
     }
 
     @GetMapping
-    public List<ProductEntity> getAllProducts(){
+    public List<ProductEntity> getAllProducts() {
         return productService.getProducts();
     }
 
     @GetMapping("/{id}")
-    public ProductEntity getProduct(@PathVariable int id){
+    public ProductEntity getProduct(@PathVariable int id) {
         return productService.getProduct(id);
     }
 
     @PutMapping
-    public Response update(@RequestBody ProductEntity product){
+    @PreAuthorize("hasRole('ADMIN')")
+    public Response update(@RequestBody ProductEntity product) {
         return productService.updateProduct(product);
     }
 
     @DeleteMapping("/{id}")
-    public Response delete(@PathVariable int id){
+    @PreAuthorize("hasRole('ADMIN')")
+    public Response delete(@PathVariable int id) {
         return productService.deleteProduct(id);
     }
 }

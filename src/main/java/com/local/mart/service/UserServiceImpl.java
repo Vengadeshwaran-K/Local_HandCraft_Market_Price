@@ -2,7 +2,9 @@ package com.local.mart.service;
 
 import com.local.mart.Repository.UserRepository;
 import com.local.mart.entity.UserEntity;
+import com.local.mart.util.JwtUtil;
 import com.local.mart.util.Response;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +14,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public UserServiceImpl(UserRepository userRepo) {
+    public UserServiceImpl(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -35,9 +41,20 @@ public class UserServiceImpl implements UserService {
         if (userRepo.existsByPhone(user.getPhone()))
             return new Response("Phone already registered");
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepo.save(user);
 
         return new Response("User Created Successfully");
+    }
+
+    @Override
+    public Response login(String email, String password) {
+        Optional<UserEntity> user = userRepo.findByEmail(email);
+        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
+            String token = jwtUtil.generateToken(user.get().getEmail(), user.get().getRole().name());
+            return new Response(token);
+        }
+        return new Response("Invalid credentials");
     }
 
     @Override
@@ -88,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<UserEntity> user = userRepo.findById(id);
 
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             response.message = "User not found";
             return response;
         }

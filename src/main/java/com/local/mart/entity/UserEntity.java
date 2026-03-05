@@ -1,9 +1,7 @@
 package com.local.mart.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.local.mart.Enum.Role;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -18,13 +16,16 @@ public class UserEntity {
     private int id;
     @NotBlank(message = "Name cannot be empty")
     private String name;
-    @Email(message="Invalid Email Format")
+    @Email(message = "Invalid Email Format")
     private String email;
-    @NotBlank(message= "Password cannot be empty")
+    @NotBlank(message = "Password cannot be empty")
     private String password;
     @NotBlank(message = "Phone number cannot be empty")
-    @Size(min=10,max=10,message="Phone msut be 10 digits")
+    @Size(min = 10, max = 10, message = "Phone msut be 10 digits")
     private String phone;
     private String address;
+
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.ROLE_USER;
 
 }

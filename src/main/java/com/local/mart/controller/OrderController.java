@@ -4,6 +4,7 @@ import com.local.mart.entity.OrderEntity;
 import com.local.mart.service.OrderService;
 import com.local.mart.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,22 +26,26 @@ public class OrderController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<OrderEntity> getAllOrders() {
         return orderService.getAllOrders();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public OrderEntity getOrderById(@PathVariable int id) {
         return orderService.getOrderById(id);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Response updateOrder(@PathVariable int id,
-                                @RequestBody OrderEntity order) {
+            @RequestBody OrderEntity order) {
         return orderService.updateOrder(id, order);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Response deleteOrder(@PathVariable int id) {
         return orderService.deleteOrder(id);
     }

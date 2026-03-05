@@ -13,9 +13,11 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepo;
+    private final MessageProducer messageProducer;
 
-    public OrderServiceImpl(OrderRepository orderRepo) {
+    public OrderServiceImpl(OrderRepository orderRepo, MessageProducer messageProducer) {
         this.orderRepo = orderRepo;
+        this.messageProducer = messageProducer;
     }
 
     @Override
@@ -37,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedAt(LocalDate.now());
 
         orderRepo.save(order);
+        messageProducer.sendMessage("New order created for product: " + order.getProductName());
 
         return new Response("Order Created Successfully");
     }
