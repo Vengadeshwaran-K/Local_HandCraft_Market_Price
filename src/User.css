@@ -1,33 +1,99 @@
 .user-container{
-  width:600px;
-  margin:auto;
-  margin-top:40px;
+  margin-top:90px;
+  width:850px;
+
+  background:white;
+  padding:30px;
+
+  border-radius:12px;
+
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.user-container h1{
+  text-align:center;
+  margin-bottom:20px;
 }
 
 .menu-buttons{
-  margin-bottom:30px;
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-bottom:25px;
 }
 
 .menu-buttons button{
-  margin-right:10px;
-  padding:8px 15px;
+  padding:8px 18px;
+
+  border:none;
+  border-radius:6px;
+
+  background:#20c997;
+  color:white;
+
+  cursor:pointer;
+}
+
+.menu-buttons button:hover{
+  background:#18a37f;
 }
 
 .user-form{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+  width:320px;
+  margin:auto;
+}
+
+.user-form label{
+  display:block;
+  margin-top:12px;
 }
 
 .user-form input{
-  padding:6px;
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+.user-form input:focus{
+  border-color:#20c997;
+  outline:none;
+}
+
+.user-form button{
+  margin-top:15px;
+  padding:8px;
+
+  width:100%;
+
+  border:none;
+  border-radius:6px;
+
+  background:#20c997;
+  color:white;
+}
+
+.table-section{
+  margin-top:25px;
 }
 
 table{
+  width:100%;
   border-collapse:collapse;
 }
 
-table th, table td{
-  border:1px solid black;
-  padding:6px 10px;
+th,td{
+  padding:12px;
+  text-align:center;
+}
+
+th{
+  background:#222;
+  color:white;
+}
+
+tr:nth-child(even){
+  background:#f3f3f3;
 }
