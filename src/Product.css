@@ -1,57 +1,108 @@
-.product-container{
-  margin-top:90px;
-  width:850px;
+/* Page Container */
 
-  background:white;
-  padding:30px;
-
-  border-radius:12px;
-
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+.product-container {
+  width: 80%;
+  margin: 40px auto;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
 }
 
-.product-container h1{
-  text-align:center;
-  margin-bottom:20px;
+/* Title */
+
+.product-container h1 {
+  margin-bottom: 30px;
+  color: #333;
 }
 
-.product-form{
-  width:320px;
-  margin:auto;
+/* Menu Buttons */
+
+.menu-buttons {
+  margin-bottom: 30px;
 }
 
-.product-form label{
-  display:block;
-  margin-top:12px;
+.menu-buttons button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #1976d2;
+  color: white;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.product-form input{
-  width:100%;
-  padding:8px;
-  margin-top:5px;
-
-  border-radius:6px;
-  border:1px solid #ccc;
+.menu-buttons button:hover {
+  background-color: #125ca1;
 }
 
-.product-form input:focus{
-  border-color:#20c997;
-  outline:none;
+/* Forms */
+
+.product-container form {
+  width: 350px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.product-form button{
-  margin-top:15px;
+/* Inputs */
 
-  width:100%;
-  padding:8px;
-
-  border:none;
-  border-radius:6px;
-
-  background:#20c997;
-  color:white;
+.product-container input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
-.product-form button:hover{
-  background:#18a37f;
+/* Form Buttons */
+
+.product-container form button {
+  padding: 10px;
+  border: none;
+  background-color: #2e7d32;
+  color: white;
+  font-size: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.product-container form button:hover {
+  background-color: #1b5e20;
+}
+
+/* Table Section */
+
+.product-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+/* Table Header */
+
+.product-container th {
+  background-color: #1976d2;
+  color: white;
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+/* Table Rows */
+
+.product-container td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Alternate Row Color */
+
+.product-container tbody tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+/* Hover Effect */
+
+.product-container tbody tr:hover {
+  background-color: #e3f2fd;
 }

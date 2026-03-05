@@ -3,111 +3,190 @@ import "./Product.css";
 
 function Product() {
 
-  const [view, setView] = useState("");
+  const baseUrl = "http://localhost:8080/products";
 
-  return (
+  const [view,setView] = useState("");
+  const [products,setProducts] = useState([]);
+
+  const [formData,setFormData] = useState({
+    id:"",
+    name:"",
+    description:"",
+    price:"",
+    category:"",
+    stock:""
+  });
+
+  const handleChange = (e)=>{
+    setFormData({
+      ...formData,
+      [e.target.name]:e.target.value
+    });
+  };
+
+  /* CREATE PRODUCT */
+
+  const createProduct = async(e)=>{
+    e.preventDefault();
+
+    const {id, ...productData} = formData;
+    const res = await fetch(baseUrl,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(productData)
+    });
+
+    const data = await res.json();
+    alert(data.message);
+  };
+
+  /* GET PRODUCTS */
+
+  const getProducts = async()=>{
+
+    const res = await fetch(baseUrl);
+    const data = await res.json();
+
+    setProducts(data);
+  };
+
+  /* UPDATE PRODUCT */
+
+  const updateProduct = async(e)=>{
+    e.preventDefault();
+
+    const res = await fetch(baseUrl,{
+      method:"PUT",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(formData)
+    });
+
+    const data = await res.json();
+    alert(data.message);
+  };
+
+  /* DELETE PRODUCT */
+
+  const deleteProduct = async(e)=>{
+    e.preventDefault();
+
+    const res = await fetch(`${baseUrl}/${formData.id}`,{
+      method:"DELETE"
+    });
+
+    const data = await res.json();
+    alert(data.message);
+  };
+
+  return(
     <div className="product-container">
 
       <h1>Product Management</h1>
 
       <div className="menu-buttons">
-        <button onClick={() => setView("create")}>Create Product</button>
-        <button onClick={() => setView("get")}>Get Products</button>
-        <button onClick={() => setView("update")}>Update Product</button>
-        <button onClick={() => setView("delete")}>Delete Product</button>
+
+        <button onClick={()=>setView("create")}>Create Product</button>
+
+        <button onClick={()=>{
+          setView("get");
+          getProducts();
+        }}>Get Products</button>
+
+        <button onClick={()=>setView("update")}>Update Product</button>
+
+        <button onClick={()=>setView("delete")}>Delete Product</button>
+
       </div>
 
-      {/* CREATE PRODUCT */}
+      {/* CREATE */}
 
-      {view === "create" && (
-        <form className="product-form">
-          <h2>Create Product</h2>
+      {view==="create" && (
 
-          <label>Name</label>
-          <input type="text" name="name" />
+        <form onSubmit={createProduct}>
 
-          <label>Description</label>
-          <input type="text" name="description" />
+          <input name="name" placeholder="Name" onChange={handleChange}/>
+          <input name="description" placeholder="Description" onChange={handleChange}/>
+          <input name="price" placeholder="Price" onChange={handleChange}/>
+          <input name="category" placeholder="Category" onChange={handleChange}/>
+          <input name="stock" placeholder="Stock" onChange={handleChange}/>
 
-          <label>Price</label>
-          <input type="number" name="price" />
+          <button>Create</button>
 
-          <label>Category</label>
-          <input type="text" name="category" />
-
-          <label>Stock</label>
-          <input type="number" name="stock" />
-
-          <button type="submit">Submit</button>
         </form>
+
       )}
 
       {/* GET PRODUCTS */}
 
-      {view === "get" && (
-        <div className="table-section">
-          <h2>Product List</h2>
+      {view==="get" && (
 
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Category</th>
-                <th>Stock</th>
-              </tr>
-            </thead>
+        <table>
 
-            <tbody>
-              <tr>
-                <td>Laptop</td>
-                <td>Gaming Laptop</td>
-                <td>80000</td>
-                <td>Electronics</td>
-                <td>10</td>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {products.map((p)=>(
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.name}</td>
+                <td>{p.description}</td>
+                <td>{p.price}</td>
+                <td>{p.category}</td>
+                <td>{p.stock}</td>
               </tr>
-            </tbody>
-          </table>
-        </div>
+            ))}
+
+          </tbody>
+
+        </table>
+
       )}
 
-      {/* UPDATE PRODUCT */}
+      {/* UPDATE */}
 
-      {view === "update" && (
-        <form className="product-form">
-          <h2>Update Product</h2>
+      {view==="update" && (
 
-          <label>Name</label>
-          <input type="text" />
+        <form onSubmit={updateProduct}>
 
-          <label>Description</label>
-          <input type="text" />
+          <input name="id" placeholder="Product ID" onChange={handleChange}/>
+          <input name="name" placeholder="Name" onChange={handleChange}/>
+          <input name="description" placeholder="Description" onChange={handleChange}/>
+          <input name="price" placeholder="Price" onChange={handleChange}/>
+          <input name="category" placeholder="Category" onChange={handleChange}/>
+          <input name="stock" placeholder="Stock" onChange={handleChange}/>
 
-          <label>Price</label>
-          <input type="number" />
+          <button>Update</button>
 
-          <label>Category</label>
-          <input type="text" />
-
-          <label>Stock</label>
-          <input type="number" />
-
-          <button type="submit">Update</button>
         </form>
+
       )}
 
-      {/* DELETE PRODUCT */}
+      {/* DELETE */}
 
-      {view === "delete" && (
-        <form className="product-form">
-          <h2>Delete Product</h2>
+      {view==="delete" && (
 
-          <label>Product ID</label>
-          <input type="text" />
+        <form onSubmit={deleteProduct}>
 
-          <button type="submit">Delete</button>
+          <input name="id" placeholder="Product ID" onChange={handleChange}/>
+
+          <button>Delete</button>
+
         </form>
+
       )}
 
     </div>
