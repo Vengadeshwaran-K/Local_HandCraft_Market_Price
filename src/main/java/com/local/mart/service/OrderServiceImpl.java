@@ -1,5 +1,6 @@
 package com.local.mart.service;
 
+import com.local.mart.Enum.Status;
 import com.local.mart.Repository.OrderRepository;
 import com.local.mart.entity.OrderEntity;
 import com.local.mart.util.Response;
@@ -20,13 +21,20 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Response createOrder(OrderEntity order) {
 
+        if (order.getProductName() == null || order.getProductName().isBlank())
+            return new Response("Product name cannot be empty");
+
         if (order.getCategory() == null || order.getCategory().isBlank())
-            return new Response("Order category cannot be empty");
+            return new Response("Category cannot be empty");
 
         if (order.getQuantity() <= 0)
             return new Response("Quantity must be greater than 0");
 
-        order.setCreated_at(LocalDate.now());
+        if (order.getPaymentMethod() == null)
+            return new Response("Payment method required");
+
+        order.setStatus(Status.CREATED);
+        order.setCreatedAt(LocalDate.now());
 
         orderRepo.save(order);
 
@@ -41,30 +49,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderEntity getOrderById(int id) {
 
-        if (!orderRepo.existsById(id)) {
-            throw new RuntimeException("Order not found with id: " + id);
-        }
-
-        return orderRepo.findById(id).get();
+        return orderRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
     @Override
     public Response updateOrder(int id, OrderEntity order) {
 
-        if (!orderRepo.existsById(id)) {
-            return new Response("Order not found with id: " + id);
-        }
+        if (!orderRepo.existsById(id))
+            return new Response("Order not found");
 
-        if (order.getQuantity() <= 0)
-            return new Response("Quantity must be greater than 0");
+        OrderEntity existing = orderRepo.findById(id).get();
 
-        OrderEntity existingOrder = orderRepo.findById(id).get();
+        existing.setCategory(order.getCategory());
+        existing.setQuantity(order.getQuantity());
+        existing.setStatus(order.getStatus());
+        existing.setPaymentMethod(order.getPaymentMethod());
 
-        existingOrder.setCategory(order.getCategory());
-        existingOrder.setQuantity(order.getQuantity());
-        existingOrder.setStatus(order.getStatus());
-
-        orderRepo.save(existingOrder);
+        orderRepo.save(existing);
 
         return new Response("Order Updated Successfully");
     }
@@ -72,9 +74,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Response deleteOrder(int id) {
 
-        if (!orderRepo.existsById(id)) {
-            return new Response("Order not found with id: " + id);
-        }
+        if (!orderRepo.existsById(id))
+            return new Response("Order not found");
 
         orderRepo.deleteById(id);
 

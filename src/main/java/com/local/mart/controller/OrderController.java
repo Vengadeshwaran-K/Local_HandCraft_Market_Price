@@ -10,29 +10,33 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
+@CrossOrigin(origins = "*")
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
-    @PostMapping("/create")
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping
     public Response createOrder(@RequestBody OrderEntity order) {
         return orderService.createOrder(order);
     }
 
-    @GetMapping("/getAllOrders")
+    @GetMapping
     public List<OrderEntity> getAllOrders() {
         return orderService.getAllOrders();
     }
 
-    @GetMapping("/{id}/order")
+    @GetMapping("/{id}")
     public OrderEntity getOrderById(@PathVariable int id) {
         return orderService.getOrderById(id);
     }
 
-    @PutMapping("/{id}/update")
+    @PutMapping("/{id}")
     public Response updateOrder(@PathVariable int id,
-                                   @RequestBody OrderEntity order) {
+                                @RequestBody OrderEntity order) {
         return orderService.updateOrder(id, order);
     }
 
