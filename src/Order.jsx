@@ -1,18 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Order.css";
 
 function Order() {
 
+  const [categories, setCategories] = useState([]);
+
   const [orderData, setOrderData] = useState({
-    customerName: "",
-    email: "",
-    address: "",
     productName: "",
+    category: "",
     quantity: "",
     paymentMethod: ""
   });
 
   const handleChange = (e) => {
+
     const { name, value } = e.target;
 
     setOrderData({
@@ -22,12 +23,20 @@ function Order() {
   };
 
   const handleSubmit = (e) => {
+
     e.preventDefault();
 
     console.log("Order Placed:", orderData);
-
-    // Later API call will go here
   };
+
+  // Fetch categories from backend
+  useEffect(() => {
+
+    fetch("http://localhost:8080/categories")
+      .then(res => res.json())
+      .then(data => setCategories(data));
+
+  }, []);
 
   return (
     <div className="order-container">
@@ -36,30 +45,6 @@ function Order() {
 
       <form className="order-form" onSubmit={handleSubmit}>
 
-        <label>Customer Name</label>
-        <input
-          type="text"
-          name="customerName"
-          value={orderData.customerName}
-          onChange={handleChange}
-        />
-
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          value={orderData.email}
-          onChange={handleChange}
-        />
-
-        <label>Address</label>
-        <input
-          type="text"
-          name="address"
-          value={orderData.address}
-          onChange={handleChange}
-        />
-
         <label>Product Name</label>
         <input
           type="text"
@@ -67,6 +52,24 @@ function Order() {
           value={orderData.productName}
           onChange={handleChange}
         />
+
+        <label>Category</label>
+
+        <select
+          name="category"
+          value={orderData.category}
+          onChange={handleChange}
+        >
+
+          <option value="">Select Category</option>
+
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
+            </option>
+          ))}
+
+        </select>
 
         <label>Quantity</label>
         <input
@@ -77,6 +80,7 @@ function Order() {
         />
 
         <label>Payment Method</label>
+
         <select
           name="paymentMethod"
           value={orderData.paymentMethod}

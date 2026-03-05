@@ -78,9 +78,6 @@ function Product() {
         <form className="product-form">
           <h2>Update Product</h2>
 
-          <label>Product ID</label>
-          <input type="text" />
-
           <label>Name</label>
           <input type="text" />
 

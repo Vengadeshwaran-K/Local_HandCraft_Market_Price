@@ -73,19 +73,27 @@ function User() {
       {/* UPDATE USER */}
 
       {view === "update" && (
-        <form className="user-form">
+          <form className="user-form">
+
           <h2>Update User</h2>
 
-          <label>User ID</label>
-          <input type="text" />
-
           <label>Name</label>
-          <input type="text" />
+          <input type="text"/>
 
           <label>Email</label>
-          <input type="email" />
+          <input type="email"/>
+
+          <label>Password</label>
+          <input type="password"/>
+
+          <label>Address</label>
+          <input type="text"/>
+
+          <label>Phone</label>
+          <input type="tel"/>
 
           <button type="submit">Update</button>
+
         </form>
       )}
 
