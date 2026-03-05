@@ -2,21 +2,31 @@ package com.local.mart.service;
 
 import com.local.mart.Repository.ProductRepository;
 import com.local.mart.entity.ProductEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.local.mart.util.Response;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    ProductRepository productRepo;
+    private final ProductRepository productRepo;
+
+    public ProductServiceImpl(ProductRepository productRepo) {
+        this.productRepo = productRepo;
+    }
 
     @Override
-    public String createProducts(ProductEntity product) {
+    public Response createProducts(ProductEntity product) {
+
+        if (product.getName() == null || product.getName().isBlank())
+            return new Response("Product name cannot be empty");
+
+        if (productRepo.existsByName(product.getName()))
+            return  new Response("Product already exists");
+
         productRepo.save(product);
-        return "Product Created";
+        return new Response("Product Created");
     }
 
     @Override
@@ -27,25 +37,38 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public ProductEntity getProduct(int id) {
         return productRepo.findById(id)
-                .orElse(new ProductEntity());
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
     }
 
     @Override
-    public String updateProduct(ProductEntity product) {
-        int id=product.getId();
-        ProductEntity product1=productRepo.findById(id).orElse(new ProductEntity());
-        product1.setId(product.getId());
-        product1.setName(product.getName());
-        product1.setStock(product.getStock());
-        product1.setPrice(product1.getPrice());
-        product1.setDescription(product.getDescription());
-        productRepo.save(product1);
-        return "Updated Product";
+    public Response updateProduct(ProductEntity product) {
+
+        ProductEntity existingProduct = productRepo.findById(product.getId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if (!existingProduct.getName().equals(product.getName()) &&
+                productRepo.existsByName(product.getName())) {
+            return new Response("Product name already exists");
+        }
+
+        existingProduct.setName(product.getName());
+        existingProduct.setStock(product.getStock());
+        existingProduct.setPrice(product.getPrice());   // FIXED
+        existingProduct.setDescription(product.getDescription());
+
+        productRepo.save(existingProduct);
+
+        return new Response("Updated Product");
     }
 
     @Override
-    public String deleteProduct(int id) {
+    public Response deleteProduct(int id) {
+
+        if (!productRepo.existsById(id)) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
+
         productRepo.deleteById(id);
-        return "Deleted";
+        return new Response("Deleted Product");
     }
 }

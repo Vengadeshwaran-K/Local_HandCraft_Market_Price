@@ -2,6 +2,7 @@ package com.local.mart.controller;
 
 import com.local.mart.entity.ProductEntity;
 import com.local.mart.service.ProductService;
+import com.local.mart.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping("/create")
-    public String create(@RequestBody ProductEntity product){
+    public Response create(@RequestBody ProductEntity product){
         return productService.createProducts(product);
     }
 
@@ -37,12 +38,12 @@ public class ProductController {
     }
 
     @PutMapping("/update")
-    public String update(@RequestBody ProductEntity product){
+    public Response update(@RequestBody ProductEntity product){
         return productService.updateProduct(product);
     }
 
     @DeleteMapping("/{id}/delete")
-    public String delete(@PathVariable int id){
+    public Response delete(@PathVariable int id){
         return productService.deleteProduct(id);
     }
 }

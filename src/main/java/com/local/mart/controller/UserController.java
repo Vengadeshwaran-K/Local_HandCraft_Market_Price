@@ -2,9 +2,8 @@ package com.local.mart.controller;
 
 import com.local.mart.entity.UserEntity;
 import com.local.mart.service.UserService;
-import com.local.mart.service.UserServiceImpl;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import com.local.mart.util.Response;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +22,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/create")
-    public String CreateUser(@RequestBody UserEntity user){
+    public Response CreateUser(@Valid @RequestBody UserEntity user){
         return userService.createUser(user);
     }
 
@@ -33,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/updateUsers")
-    public String updateUser(@RequestBody UserEntity user){
+    public Response updateUser(@RequestBody UserEntity user){
         return userService.updateUser(user);
     }
 
@@ -43,8 +42,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/users")
-    public String deleteUser(@PathVariable int id){
-        return userService.DeleteUSer(id);
+    public Response deleteUser(@PathVariable int id){
+        return userService.deleteUser(id);
     }
 
 }
