@@ -46,17 +46,14 @@ public class OrderServiceImpl implements OrderService {
             return new Response("Insufficient stock. Only " + product.getStock() + " left.");
         }
 
-        // Reduce stock
         product.setStock(product.getStock() - order.getQuantity());
         productRepo.save(product);
 
-        // Map order details from product for consistency
         order.setProductName(product.getName());
         order.setCategory(product.getCategory());
         order.setStatus(Status.CREATED);
         order.setCreatedAt(LocalDate.now());
 
-        // Set user email from security context if not provided
         if (order.getUserEmail() == null || order.getUserEmail().isBlank()) {
             org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
                     .getContext().getAuthentication();

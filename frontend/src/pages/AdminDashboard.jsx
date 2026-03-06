@@ -196,9 +196,9 @@ const AdminDashboard = () => {
                                         <span style={{ padding: '4px 10px', borderRadius: '4px', background: 'var(--glass)', fontSize: '0.8rem', color: 'var(--accent)' }}>{o.status}</span>
                                     </div>
                                     <div style={{ display: 'flex', gap: '10px' }}>
-                                        <button onClick={() => handleUpdateOrderStatus(o.id, 'SHIPPED')} className="btn-primary" style={{ padding: '8px', flex: 1, background: '#3b82f6', fontSize: '0.8rem' }}><Clock size={14} /> Ship</button>
-                                        <button onClick={() => handleUpdateOrderStatus(o.id, 'DELIVERED')} className="btn-primary" style={{ padding: '8px', flex: 1, background: '#10b981', fontSize: '0.8rem' }}><Check size={14} /> Deliver</button>
-                                        <button onClick={() => handleDeleteOrder(o.id)} style={{ background: 'var(--danger)', padding: '8px', borderRadius: '6px' }}><Trash2 size={16} /></button>
+                                        <button onClick={() => handleDeleteOrder(o.id)} style={{ background: 'var(--danger)', padding: '8px', borderRadius: '6px', flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <Trash2 size={16} /> Delete Order
+                                        </button>
                                     </div>
                                 </div>
                             ))}

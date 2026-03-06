@@ -3,15 +3,11 @@ package com.local.mart.controller;
 import com.local.mart.entity.OrderEntity;
 import com.local.mart.service.OrderService;
 import com.local.mart.util.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 @RestController
 @RequestMapping("/orders")
-@CrossOrigin(origins = "*")
 public class OrderController {
 
     private final OrderService orderService;

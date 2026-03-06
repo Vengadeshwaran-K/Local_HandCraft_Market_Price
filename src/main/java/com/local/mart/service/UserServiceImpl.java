@@ -16,11 +16,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final MessageProducer messageProducer;
 
-    public UserServiceImpl(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public UserServiceImpl(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+            MessageProducer messageProducer) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.messageProducer = messageProducer;
     }
 
     @Override
@@ -46,6 +49,12 @@ public class UserServiceImpl implements UserService {
             user.setRole(com.local.mart.Enum.Role.ROLE_USER);
         }
         userRepo.save(user);
+
+        try {
+            messageProducer.sendMessage("User Created: " + user.getName() + " (" + user.getEmail() + ")");
+        } catch (Exception e) {
+            System.err.println("Failed to send user creation message: " + e.getMessage());
+        }
 
         return new Response("User Created Successfully");
     }

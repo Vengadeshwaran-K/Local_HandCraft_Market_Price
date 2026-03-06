@@ -11,9 +11,11 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepo;
+    private final MessageProducer messageProducer;
 
-    public ProductServiceImpl(ProductRepository productRepo) {
+    public ProductServiceImpl(ProductRepository productRepo, MessageProducer messageProducer) {
         this.productRepo = productRepo;
+        this.messageProducer = messageProducer;
     }
 
     @Override
@@ -23,9 +25,17 @@ public class ProductServiceImpl implements ProductService {
             return new Response("Product name cannot be empty");
 
         if (productRepo.existsByName(product.getName()))
-            return  new Response("Product already exists");
+            return new Response("Product already exists");
 
         productRepo.save(product);
+
+        try {
+            messageProducer
+                    .sendMessage("New Product Added: " + product.getName() + " in category " + product.getCategory());
+        } catch (Exception e) {
+            System.err.println("Failed to send product creation message: " + e.getMessage());
+        }
+
         return new Response("Product Created");
     }
 
@@ -54,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setName(product.getName());
         existingProduct.setStock(product.getStock());
         existingProduct.setCategory(product.getCategory());
-        existingProduct.setPrice(product.getPrice());   // FIXED
+        existingProduct.setPrice(product.getPrice()); // FIXED
         existingProduct.setDescription(product.getDescription());
 
         productRepo.save(existingProduct);
