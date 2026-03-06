@@ -86,18 +86,6 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleUpdateOrderStatus = async (id, status) => {
-        try {
-            const order = orders.find(o => o.id === id);
-            await api.put(`/orders/${id}`, { ...order, status });
-            setMessage(`Order #${id} updated to ${status}`);
-            const res = await api.get('/orders');
-            setOrders(res.data);
-        } catch (err) {
-            setMessage('Failed to update order: ' + (err.response?.data?.message || err.message));
-        }
-    };
-
     const handleDeleteOrder = async (id) => {
         if (!window.confirm('Delete this order record?')) return;
         try {
